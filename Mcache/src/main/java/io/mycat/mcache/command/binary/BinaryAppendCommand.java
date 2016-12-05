@@ -30,14 +30,12 @@ public class BinaryAppendCommand implements Command{
 	private static final Logger logger = LoggerFactory.getLogger(BinaryAppendCommand.class);
 	@Override
 	public void execute(Connection conn) throws IOException {
-		logger.info("execute command append");
-
+		int bodylen = conn.getBinaryRequestHeader().getBodylen();
 		int keylen = conn.getBinaryRequestHeader().getKeylen();
 		int extlen = conn.getBinaryRequestHeader().getExtlen();
-		ByteBuffer value = readValue(conn);
-		// 检查参数合法性
-		if (extlen == 0 && keylen > 0 && value.remaining() > 0) {
+		if (extlen == 0 && keylen > 0 && bodylen > keylen) {
 			ByteBuffer key = readkey(conn);
+			ByteBuffer value = readValue(conn);
 			String keystr = new String(cs.decode(key).array());
 			logger.info("execute command append key {}", keystr);
 			// TODO 调用memory append接口
