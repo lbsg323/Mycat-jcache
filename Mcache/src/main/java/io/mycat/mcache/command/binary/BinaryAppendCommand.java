@@ -39,7 +39,7 @@ public class BinaryAppendCommand implements Command{
 					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_KEY_ENOENT.getStatus(), 1L);
 		}
 		ByteBuffer value = readValue(conn);
-		// TODO
+		// 检查value的长度
 		if (value.remaining() > McacheGlobalConfig.VALUE_MAX_LENGTH) {
 			writeResponse(conn, BinaryProtocol.OPCODE_SET,
 					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_E2BIG.getStatus(), 1l);
