@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.mycat.mcache.McacheGlobalConfig;
 import io.mycat.mcache.command.Command;
 import io.mycat.mcache.conn.Connection;
 import io.mycat.mcache.conn.handler.BinaryProtocol;
@@ -14,7 +13,7 @@ import io.mycat.mcache.conn.handler.BinaryProtocol;
 /**
  * append 命令
  * @author Bin.Lin
- * @creatDate 2016年12月4日
+ * @creatDate 2016年12月5日
  * Request
  * MUST NOT have extras.
    MUST have key.
@@ -32,20 +31,22 @@ public class BinaryAppendCommand implements Command{
 	@Override
 	public void execute(Connection conn) throws IOException {
 		logger.info("execute command append");
-		// 检查 key的长度，key最大长度250个字节
-		ByteBuffer key = readkey(conn);
-		if (key.remaining() > McacheGlobalConfig.KEY_MAX_LENGTH) {
-			writeResponse(conn, BinaryProtocol.OPCODE_SET,
-					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_KEY_ENOENT.getStatus(), 1L);
-		}
+
+		int keylen = conn.getBinaryRequestHeader().getKeylen();
+		int extlen = conn.getBinaryRequestHeader().getExtlen();
 		ByteBuffer value = readValue(conn);
-		// 检查value的长度
-		if (value.remaining() > McacheGlobalConfig.VALUE_MAX_LENGTH) {
-			writeResponse(conn, BinaryProtocol.OPCODE_SET,
-					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_E2BIG.getStatus(), 1l);
+		// 检查参数合法性
+		if (extlen == 0 && keylen > 0 && value.remaining() > 0) {
+			ByteBuffer key = readkey(conn);
+			String keystr = new String(cs.decode(key).array());
+			logger.info("execute command append key {}", keystr);
+			// TODO 调用memory append接口
+			writeResponse(conn, BinaryProtocol.OPCODE_APPEND,
+					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_SUCCESS.getStatus(), 1L);
+		} else {
+			writeResponse(conn, BinaryProtocol.OPCODE_APPEND,
+					ProtocolResponseStatus.PROTOCOL_BINARY_RESPONSE_EINVAL.getStatus(), 0L);
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.mycat.mcache.command.binary.BinaryAddCommand;
+import io.mycat.mcache.command.binary.BinaryAppendCommand;
 import io.mycat.mcache.command.binary.BinaryDecrCommand;
 import io.mycat.mcache.command.binary.BinaryDecrQCommand;
 import io.mycat.mcache.command.binary.BinaryDeleteCommand;
@@ -24,7 +25,6 @@ import io.mycat.mcache.command.binary.BinaryReplaceCommand;
 import io.mycat.mcache.command.binary.BinarySetCommand;
 import io.mycat.mcache.command.binary.BinaryTouchCommand;
 import io.mycat.mcache.command.binary.BinaryVersionCommand;
-import io.mycat.mcache.conn.handler.BinaryProtocol;
 
 
 /**
@@ -62,6 +62,7 @@ public class CommandContext {
 		commandMap.put(CommandType.decrement, new BinaryDecrCommand());
 		commandMap.put(CommandType.incrementq, new BinaryIncrQCommand());
 		commandMap.put(CommandType.decrementq, new BinaryDecrQCommand());
+		commandMap.put(CommandType.append, new BinaryAppendCommand());
 	}
 	
 	private CommandContext(){}
